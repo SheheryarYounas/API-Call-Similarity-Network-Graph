@@ -2,66 +2,100 @@ import pandas as pd
 import networkx as nx
 import pydot
 
-#Step 1: Load the dataset
+while True: 
 
-dataset_file = 'dynamic_api_call_sequence_per_malware_100_0_306.csv'
+    #Step 1: Load the dataset
 
-dataset = pd.read_csv(dataset_file)
+    dataset_file = 'dynamic_api_call_sequence_per_malware_100_0_306.csv'
 
-#print(dataset.head())
+    dataset = pd.read_csv(dataset_file)
 
-#Step 2: Filter the dataset to include only malware samples
+    print(f"Enter 1 for Malware Similarity Analysis")
+    print(f"Enter 2 for Goodware Similarity Analysis ")
+    print(f"Enter 3 to Exit")
 
-malware_dataset = dataset[dataset['malware'] == 1].head(100)
+    choice = int(input())
 
-#print(malware_dataset.head())
+    #print(dataset.head())
 
-#Step 3: Extract the unique API calls from malware samples
+    #Step 2: Filter the dataset to include only malware samples
 
-unique_api_sequences = []
-for _, row in malware_dataset.iterrows():
-  api_sequence = tuple(row[1:101].unique())  # Extract and convert to tuple
-  unique_api_sequences.append(api_sequence)
+    if choice == 1:
+        print("Please select how many malware samples you want to analyze (10 is recommended):")
+        num_malware_samples = int(input())
 
-print(f"Number of unique API sequences: {len(unique_api_sequences)}")
+        malware_dataset = dataset[dataset['malware'] == 1].head(num_malware_samples)
 
-#print(unique_api_calls)
+    elif choice == 2:
+        print("Please select how many goodware samples you want to analyze (10 is recommended):")
+        num_goodware_samples = int(input())
 
-#Step 4: Compare each pair of malware samples and calculate the Jaccard Similarity
+        malware_dataset = dataset[dataset['malware'] == 0].head(num_goodware_samples)
 
-connected_pairs = []
-threshold = 0.7
+    elif choice == 3:
+        break
 
-print(f"Threshold value: {threshold}")
+    #print(malware_dataset.head())
 
-for i in range(len(unique_api_sequences)):
+    #Step 3: Extract the unique API calls from malware samples
 
-    for j in range(i + 1, len(unique_api_sequences)):
+    unique_api_sequences = []
+    for _, row in malware_dataset.iterrows():
+        api_sequence = tuple(row[1:101].unique())  # Extract and convert to tuple
+        unique_api_sequences.append(api_sequence)
 
-        intersection = set(unique_api_sequences[i]).intersection(set(unique_api_sequences[j]))
-        union = set(unique_api_sequences[i]).union(set(unique_api_sequences[j]))
+    print(f"Number of unique API sequences: {len(unique_api_sequences)}")
 
-        jaccard_similarity = len(intersection) / len(union)
+    #print(unique_api_calls)
 
-        #print(f"Jaccard Similarity between malware {i} and malware {j}: {jaccard_similarity}")
+    #Step 4: Compare each pair of malware samples and calculate the Jaccard Similarity
 
-        if jaccard_similarity > threshold:
-            connected_pairs.append((i, j))
+    connected_pairs = []
+    print("Please enter a threshold value for Jaccard Similarity (between 0 and 1):")
+    threshold = float(input())
 
-        
-print(f"Number of connected malware samples: {len(connected_pairs)}")
+    if threshold < 0 or threshold > 1:
+        print("Invalid threshold value. Please enter a value between 0 and 1.")
+        continue
 
-#Step 5: Create a graph to visualize the connected malware samples
+    print(f"Threshold value: {threshold}")
 
-G = nx.Graph()
+    for i in range(len(unique_api_sequences)):
 
-for i in range(100):
-    G.add_node(i)
+        for j in range(i + 1, len(unique_api_sequences)):
 
-for pair in connected_pairs:
-    G.add_edge(pair[0], pair[1])
+            intersection = set(unique_api_sequences[i]).intersection(set(unique_api_sequences[j]))
+            union = set(unique_api_sequences[i]).union(set(unique_api_sequences[j]))
 
-nx.drawing.nx_pydot.write_dot(G, 'malware_graph.dot')
+            jaccard_similarity = len(intersection) / len(union)
+
+            #print(f"Jaccard Similarity between malware {i} and malware {j}: {jaccard_similarity}")
+
+            if jaccard_similarity > threshold:
+                connected_pairs.append((i, j))
+
+            
+    if choice == 1:
+        print(f"Number of connected malware samples: {len(connected_pairs)}")
+    elif choice == 2:
+        print(f"Number of connected goodware samples: {len(connected_pairs)}")
+
+    #Step 5: Create a graph to visualize the connected malware samples
+
+    G = nx.Graph()
+
+    number_of_nodes = len(unique_api_sequences)
+
+    for i in range(number_of_nodes):
+        G.add_node(i)
+
+    for pair in connected_pairs:
+        G.add_edge(pair[0], pair[1])
+
+    if choice == 1:
+        nx.drawing.nx_pydot.write_dot(G, 'malware_graph.dot')
+    elif choice == 2:
+        nx.drawing.nx_pydot.write_dot(G, 'goodware_graph.dot')
 
 
 
