@@ -14,5 +14,5 @@ This project explores the similarity between malware samples by analyzing their 
 
 1. Clone the repository: `git clone https://github.com/your_username/malware-similarity-analysis.git`
 2. Install dependencies: `pip install -r requirements.txt`
-3. Run the script: `python malware_similarity_analysis.py`
+3. Run the script: `python application_similarity_analysis.py`
 4. Explore the generated DOT file to visualize connected malware samples.
