@@ -24,16 +24,28 @@ while True:
         print("Please select how many malware samples you want to analyze (10 is recommended):")
         num_malware_samples = int(input())
 
+        if num_malware_samples <= 0:
+            print("Invalid number of samples. Please enter a value greater than 0.")
+            continue
+
         malware_dataset = dataset[dataset['malware'] == 1].head(num_malware_samples)
 
     elif choice == 2:
         print("Please select how many goodware samples you want to analyze (10 is recommended):")
         num_goodware_samples = int(input())
 
+        if num_goodware_samples <= 0:
+            print("Invalid number of samples. Please enter a value greater than 0.")
+            continue
+
         malware_dataset = dataset[dataset['malware'] == 0].head(num_goodware_samples)
 
     elif choice == 3:
         break
+
+    else:
+        print("Invalid choice. Please enter 1, 2, or 3.")
+        continue
 
     #print(malware_dataset.head())
 
